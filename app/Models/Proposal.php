@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class Proposal extends Model
 {
@@ -22,6 +23,13 @@ class Proposal extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Proposal $proposal) {
+            $proposal->uuid = Str::orderedUuid();
+        });
     }
 
     public function work(): BelongsTo

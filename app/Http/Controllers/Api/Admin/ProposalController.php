@@ -42,7 +42,6 @@ class ProposalController extends Controller
             'freelancer_id' => ['required', 'integer', 'min:1'],
             'profile_id' => ['required', 'integer', 'min:1'],
             'cover_letter' => ['required', 'string', 'min:1'],
-            'status' => ['required', 'integer', 'min:0', 'max:2'],
         ]);
 
         if ($validation->fails()) {
@@ -57,7 +56,6 @@ class ProposalController extends Controller
             'freelancer_id' => $request->freelancer_id,
             'profile_id' => $request->profile_id,
             'cover_letter' => $request->cover_letter,
-            'status' => $request->status,
 
         ]);
 
@@ -69,7 +67,6 @@ class ProposalController extends Controller
                 'freelancer_id' => $objects->freelancer_id,
                 'profile_id' => $objects->profile_id,
                 'cover_letter' => $objects->cover_letter,
-                'status' => $objects->status,
             ],
             'message' => 'Profile created.',
         ], Response::HTTP_OK);
