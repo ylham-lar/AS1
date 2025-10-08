@@ -17,6 +17,10 @@ class Proposal extends Model
         'updated_at',
     ];
 
+    public static function when(bool $isset, \Closure $param)
+    {
+    }
+
     protected function casts(): array
     {
         return [

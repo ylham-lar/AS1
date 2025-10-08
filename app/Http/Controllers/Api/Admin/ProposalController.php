@@ -12,11 +12,21 @@ class ProposalController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate([
+
+        $validation = Validator::make($request->all(), [
             'work_id' => ['nullable', 'integer', 'min:1'],
             'freelancer_id' => ['nullable', 'integer', 'min:1'],
             'profile_id' => ['nullable', 'integer', 'min:1'],
         ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => 0,
+                'message' => $validation->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+
         $filter_work = $request->has('work_id') ? $request->work_id : null;
         $filter_freelancer = $request->has('freelancer_id') ? $request->freelancer_id : null;
         $filter_profile = $request->has('profile_id') ? $request->profile_id : null;
@@ -25,13 +35,20 @@ class ProposalController extends Controller
             ->when(isset($filter_work), fn($query) => $query->where('work_id', $filter_work))
             ->when(isset($filter_profile), fn($query) => $query->where('profile_id', $filter_profile))
             ->orderBy('id')
-            ->get();
+            ->get()
+            ->transform(function ($obj) {
+                return [
+                    'id' => $obj->id,
+                    'work_id' => $obj->work_id,
+                    'freelancer_id' => $obj->freelancer_id,
+                    'profile_id' => $obj->profile_id,
+                    'cover_letter' => $obj->cover_letter,
+                ];
+            });
 
         return response()->json([
             'status' => 1,
-            'data' => [
-                'Proposals' => $proposals,
-            ],
+            'data' => $proposals,
         ], Response::HTTP_OK);
     }
 
@@ -51,24 +68,24 @@ class ProposalController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $objects = Proposal::create([
-            'work_id' => $request->work_id,
-            'freelancer_id' => $request->freelancer_id,
-            'profile_id' => $request->profile_id,
-            'cover_letter' => $request->cover_letter,
+        $proposal = new Proposal();
+        $proposal->work_id = $request->work_id;
+        $proposal->freelancer_id = $request->freelancer_id;
+        $proposal->profile_id = $request->profile_id;
+        $proposal->cover_letter = $request->cover_letter;
+        $proposal->save();
 
-        ]);
 
         return response()->json([
             'status' => 1,
             'data' => [
-                'id' => $objects->id,
-                'work_id' => $objects->work_id,
-                'freelancer_id' => $objects->freelancer_id,
-                'profile_id' => $objects->profile_id,
-                'cover_letter' => $objects->cover_letter,
+                'id' =>  $proposal->id,
+                'work_id' =>  $proposal->work_id,
+                'freelancer_id' => $proposal->freelancer_id,
+                'profile_id' =>  $proposal->profile_id,
+                'cover_letter' =>  $proposal->cover_letter,
             ],
-            'message' => 'Profile created.',
+            'message' => 'Proposal created.',
         ], Response::HTTP_OK);
     }
 
@@ -89,25 +106,23 @@ class ProposalController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $objects = Proposal::findOrFail($id);
-        $objects->work_id = $request->work_id;
-        $objects->freelancer_id = $request->freelancer_id;
-        $objects->profile_id = $request->profile_id;
-        $objects->cover_letter = $request->cover_letter;
-        $objects->status = $request->status;
-        $objects->update();
+        $proposal = Proposal::findOrFail($id);
+        $proposal->work_id = $request->work_id;
+        $proposal->freelancer_id = $request->freelancer_id;
+        $proposal->profile_id = $request->profile_id;
+        $proposal->cover_letter = $request->cover_letter;
+        $proposal->update();
 
         return response()->json([
             'status' => 1,
             'data' => [
-                'id' => $objects->id,
-                'work_id' => $objects->work_id,
-                'freelancer_id' => $objects->freelancer_id,
-                'profile_id' => $objects->profile_id,
-                'cover_letter' => $objects->cover_letter,
-                'status' => $objects->status,
+                'id' => $proposal->id,
+                'work_id' => $proposal->work_id,
+                'freelancer_id' => $proposal->freelancer_id,
+                'profile_id' => $proposal->profile_id,
+                'cover_letter' => $proposal->cover_letter,
             ],
-            'message' => 'Profile updated.',
+            'message' => 'Proposal updated.',
         ], Response::HTTP_OK);
     }
 

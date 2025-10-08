@@ -26,33 +26,33 @@ Route::prefix('v1/admin')
                     });
 
                 Route::controller(FreelancerController::class)
-                    ->prefix('freelancer')
+                    ->prefix('freelancers')
                     ->group(function () {
-                        Route::get('', 'index')->name('index');
+                        Route::get('', 'index');
                     });
 
                 Route::controller(ProfileController::class)
-                    ->prefix('profile')
+                    ->prefix('profiles')
                     ->group(function () {
-                        Route::get('', 'index')->name('index');
-                        Route::post('store', 'store')->name('store');
-                        Route::put('{id}/update', 'update')->name('update')->where(['id' => '[0-9]+']);
-                        Route::delete('{id}/delete', 'destroy')->name('destroy')->where(['id' => '[0-9]+']);
+                        Route::get('', 'index');
+                        Route::post('store', 'store');
+                        Route::put('{id}/update', 'update')->where(['id' => '[0-9]+']);
+                        Route::delete('{id}/delete', 'destroy')->where(['id' => '[0-9]+']);
                     });
 
                 Route::controller(ClientController::class)
-                    ->prefix('client')
+                    ->prefix('clients')
                     ->group(function () {
-                        Route::get('', 'index')->name('index');
+                        Route::get('', 'index');
                     });
 
                 Route::controller(ProposalController::class)
-                    ->prefix('proposal')
+                    ->prefix('proposals')
                     ->group(function () {
-                        Route::get('', 'index')->name('index');
-                        Route::post('store', 'store')->name('store');
-                        Route::put('{id}/update', 'update')->name('update')->where(['id' => '[0-9]+']);
-                        Route::delete('{id}/delete', 'destroy')->name('destroy')->where(['id' => '[0-9]+']);
+                        Route::get('', 'index');
+                        Route::post('store', 'store');
+                        Route::put('{id}/update', 'update')->where(['id' => '[0-9]+']);
+                        Route::delete('{id}/delete', 'destroy')->where(['id' => '[0-9]+']);
                     });
             });
     });

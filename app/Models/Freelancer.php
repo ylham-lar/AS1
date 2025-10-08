@@ -29,6 +29,10 @@ class Freelancer extends Authenticatable
         'remember_token',
     ];
 
+    public static function when(bool $isset, \Closure $param)
+    {
+    }
+
     protected function casts(): array
     {
         return [

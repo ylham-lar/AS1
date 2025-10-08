@@ -13,16 +13,30 @@ class ProfileController extends Controller
 
     public function index(Request $request)
     {
-        $request->validate([
+        $validation = Validator::make($request->all(), [
             'freelancer_id' => ['nullable', 'integer', 'min:1'],
         ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => 0,
+                'message' => $validation->errors(),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
         $filter_freelancer = $request->has('freelancer_id') ? $request->freelancer_id : null;
 
         $profiles = Profile::when($filter_freelancer, function ($query, $filter_freelancer) {
             return $query->where('freelancer_id', $filter_freelancer);
         })
             ->orderBy('id')
-            ->get();
+            ->get()->transform(function ($obj) {
+                return [
+                    'id' => $obj->id,
+                    'freelancer_id' => $obj->freelancer_id,
+                    'title' => $obj->title,
+                    'body' => $obj->body,
+                ];
+            });;
 
         return response()->json([
             'status' => 1,
@@ -46,19 +60,19 @@ class ProfileController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $objects = Profile::create([
-            'freelancer_id' => $request->freelancer_id,
-            'title' => $request->title,
-            'body' => $request->body,
-        ]);
+        $profile = new Profile();
+        $profile->freelancer_id = $request->freelancer_id;
+        $profile->title = $request->title;
+        $profile->body = $request->body;
+        $profile->save();
 
         return response()->json([
             'status' => 1,
             'data' => [
-                'id' => $objects->id,
-                'freelancer_id' => $objects->freelancer_id,
-                'title' => $objects->title,
-                'body' => $objects->body,
+                'id' => $profile->id,
+                'freelancer_id' => $profile->freelancer_id,
+                'title' => $profile->title,
+                'body' => $profile->body,
             ],
             'message' => 'Profile created.',
         ], Response::HTTP_OK);
@@ -79,19 +93,19 @@ class ProfileController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $objects = Profile::findOrFail($id);
-        $objects->freelancer_id = $request->freelancer_id;
-        $objects->title = $request->title;
-        $objects->body = $request->body;
-        $objects->update();
+        $profile = Profile::findOrFail($id);
+        $profile->freelancer_id = $request->freelancer_id;
+        $profile->title = $request->title;
+        $profile->body = $request->body;
+        $profile->update();
 
         return response()->json([
             'status' => 1,
             'data' => [
-                'id' => $objects->id,
-                'freelancer_id' => $objects->freelancer_id,
-                'title' => $objects->title,
-                'body' => $objects->body,
+                'id' => $profile->id,
+                'freelancer_id' => $profile->freelancer_id,
+                'title' => $profile->title,
+                'body' => $profile->body,
             ],
             'message' => 'Profile updated.',
         ], Response::HTTP_OK);
